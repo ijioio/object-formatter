@@ -1,7 +1,11 @@
 package com.ijioio.object.format;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
+import com.ijioio.object.format.Configuration.DelegateConfiguration.DelegateConfigurationBuilder;
 import com.ijioio.object.format.Configuration.ParserConfiguration.ParserConfigurationBuilder;
 
 public class Configuration {
@@ -12,19 +16,29 @@ public class Configuration {
 
 	private final ParserConfiguration parserConfiguration;
 
+	private final DelegateConfiguration delegateConfiguration;
+
 	private Configuration(ConfigurationBuilder builder) {
 
 		this.parserConfiguration = Optional.ofNullable(builder.parserConfiguration)
 				.orElse(ParserConfiguration.builder().build());
+		this.delegateConfiguration = Optional.ofNullable(builder.delegateConfiguration)
+				.orElse(DelegateConfiguration.builder().build());
 	}
 
 	public ParserConfiguration getParserConfiguration() {
 		return parserConfiguration;
 	}
 
+	public DelegateConfiguration getDelegateConfiguration() {
+		return delegateConfiguration;
+	}
+
 	public static class ConfigurationBuilder {
 
 		private ParserConfiguration parserConfiguration;
+
+		private DelegateConfiguration delegateConfiguration;
 
 		private ConfigurationBuilder() {
 			// Empty
@@ -38,6 +52,16 @@ public class Configuration {
 
 		public ParserConfigurationBuilder parserConfiguration() {
 			return ParserConfiguration.builder(this);
+		}
+
+		public ConfigurationBuilder delegateConfiguration(DelegateConfiguration delegateConfiguration) {
+
+			this.delegateConfiguration = delegateConfiguration;
+			return this;
+		}
+
+		public DelegateConfigurationBuilder delegateConfiguration() {
+			return DelegateConfiguration.builder(this);
 		}
 
 		public Configuration build() {
@@ -166,6 +190,58 @@ public class Configuration {
 
 			public ParserConfiguration build() {
 				return new ParserConfiguration(this);
+			}
+		}
+	}
+
+	public static class DelegateConfiguration {
+
+		public static DelegateConfigurationBuilder builder() {
+			return new DelegateConfigurationBuilder(null);
+		}
+
+		public static DelegateConfigurationBuilder builder(ConfigurationBuilder parent) {
+			return new DelegateConfigurationBuilder(parent);
+		}
+
+		private final Map<Class<?>, Class<?>> delegates = new HashMap<>();
+
+		private DelegateConfiguration(DelegateConfigurationBuilder builder) {
+
+			this.delegates.clear();
+			this.delegates.putAll(builder.delegates);
+
+			// TODO: validate not null keys/values
+		}
+
+		public Map<Class<?>, Class<?>> getDelegates() {
+			return Collections.unmodifiableMap(delegates);
+		}
+
+		public static class DelegateConfigurationBuilder {
+
+			private final ConfigurationBuilder parent;
+
+			private final Map<Class<?>, Class<?>> delegates = new HashMap<>();
+
+			private DelegateConfigurationBuilder(ConfigurationBuilder parent) {
+				this.parent = parent;
+			}
+
+			public DelegateConfigurationBuilder delegate(Class<?> type, Class<?> delegateType) {
+
+				delegates.put(type, delegateType);
+				return this;
+			}
+
+			public ConfigurationBuilder end() {
+
+				parent.delegateConfiguration(build());
+				return parent;
+			}
+
+			public DelegateConfiguration build() {
+				return new DelegateConfiguration(this);
 			}
 		}
 	}
