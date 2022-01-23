@@ -14,7 +14,7 @@ public @interface FormatElement {
 
 	public String value() default "";
 
-	public Class<? extends Extractor<?>> extractor() default Extractor.Default.class;
+	public Class<? extends Extractor<?>> extractor() default Extractor.Empty.class;
 
-	public Class<? extends Formatter<?>> formatter() default Formatter.Default.class;
+	public Class<? extends Formatter<?>> formatter() default Formatter.Empty.class;
 }
