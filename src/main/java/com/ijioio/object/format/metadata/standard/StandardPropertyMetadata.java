@@ -37,6 +37,11 @@ public class StandardPropertyMetadata implements PropertyMetadata {
 
 	private void init() {
 
+		Set<String> aliases = new HashSet<>();
+
+		Class<? extends Extractor<?>> extractor = null;
+		Class<? extends Formatter<?>> formatter = null;
+
 		if (field != null) {
 
 			FormatElement formatElement = field.getAnnotation(FormatElement.class);
@@ -49,10 +54,8 @@ public class StandardPropertyMetadata implements PropertyMetadata {
 					aliases.add(alias);
 				}
 
-				extractor = !formatElement.extractor().equals(Extractor.Default.class) ? formatElement.extractor()
-						: null;
-				formatter = !formatElement.formatter().equals(Formatter.Default.class) ? formatElement.formatter()
-						: null;
+				extractor = !formatElement.extractor().equals(Extractor.Empty.class) ? formatElement.extractor() : null;
+				formatter = !formatElement.formatter().equals(Formatter.Empty.class) ? formatElement.formatter() : null;
 			}
 		}
 
@@ -68,22 +71,26 @@ public class StandardPropertyMetadata implements PropertyMetadata {
 					aliases.add(alias);
 				}
 
-				extractor = !formatElement.extractor().equals(Extractor.Default.class) ? formatElement.extractor()
-						: null;
-				formatter = !formatElement.formatter().equals(Formatter.Default.class) ? formatElement.formatter()
-						: null;
+				extractor = !formatElement.extractor().equals(Extractor.Empty.class) ? formatElement.extractor() : null;
+				formatter = !formatElement.formatter().equals(Formatter.Empty.class) ? formatElement.formatter() : null;
 			}
 		}
-	}
 
-	@Override
-	public Class<?> getType() {
-		return MetadataUtil.normalizeType(field != null ? field.getType() : delegateField.getType());
+		this.aliases.clear();
+		this.aliases.addAll(aliases);
+
+		this.extractor = extractor;
+		this.formatter = formatter;
 	}
 
 	@Override
 	public String getId() {
 		return field != null ? field.getName() : delegateField.getName();
+	}
+
+	@Override
+	public Class<?> getType() {
+		return MetadataUtil.normalizeType(field != null ? field.getType() : delegateField.getType());
 	}
 
 	@Override
