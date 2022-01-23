@@ -5,9 +5,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.ijioio.object.format.formatter.Formatter;
+
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface FormatType {
 
 	public String value() default "";
+
+	public Class<? extends Formatter<?>> formatter() default Formatter.Empty.class;
 }

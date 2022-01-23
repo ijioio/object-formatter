@@ -4,13 +4,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ijioio.object.format.Configuration.ParserConfiguration;
+import com.ijioio.object.format.exception.FormatException;
+import com.ijioio.object.format.extractor.Extractor;
+import com.ijioio.object.format.formatter.Formatter;
+import com.ijioio.object.format.formatter.FormatterRegistry;
+import com.ijioio.object.format.metadata.ObjectMetadata;
+import com.ijioio.object.format.metadata.PropertyMetadata;
+import com.ijioio.object.format.object.ObjectHolder;
 import com.ijioio.object.format.util.DebugUtil;
 import com.ijioio.object.format.util.TextUtil;
 import com.ijioio.object.format.util.TupleUtil.Pair;
@@ -91,20 +101,23 @@ public class ObjectFormatter {
 
 							Collection<Pair<String, Entry>> entries = new ArrayList<>();
 
-							Optional.ofNullable(((VariableEntry) entry.getSecond()).id)
-									.ifPresent(item -> entries.add(Pair.of("id", item)));
-							Optional.ofNullable(((VariableEntry) entry.getSecond()).padding)
-									.ifPresent(item -> entries.add(Pair.of("padding", item)));
-							Optional.ofNullable(((VariableEntry) entry.getSecond()).prefix)
-									.ifPresent(item -> entries.add(Pair.of("prefix", item)));
-							Optional.ofNullable(((VariableEntry) entry.getSecond()).suffix)
-									.ifPresent(item -> entries.add(Pair.of("suffix", item)));
-							Optional.ofNullable(((VariableEntry) entry.getSecond()).separator)
-									.ifPresent(item -> entries.add(Pair.of("separator", item)));
-							Optional.ofNullable(((VariableEntry) entry.getSecond()).patternn)
-									.ifPresent(item -> entries.add(Pair.of("pattern", item)));
-							Optional.ofNullable(((VariableEntry) entry.getSecond()).defaultt)
-									.ifPresent(item -> entries.add(Pair.of("default", item)));
+							// TODO: make it use constants!
+							Optional.ofNullable(((VariableEntry) entry.getSecond()).idData)
+									.ifPresent(item -> entries.add(Pair.of("id", item.getSecond())));
+							Optional.ofNullable(((VariableEntry) entry.getSecond()).separatorData)
+									.ifPresent(item -> entries.add(Pair.of("separator", item.getSecond())));
+							Optional.ofNullable(((VariableEntry) entry.getSecond()).patternData)
+									.ifPresent(item -> entries.add(Pair.of("pattern", item.getSecond())));
+							Optional.ofNullable(((VariableEntry) entry.getSecond()).defaultData)
+									.ifPresent(item -> entries.add(Pair.of("default", item.getSecond())));
+//							Optional.ofNullable(((VariableEntry) entry.getSecond()).idData)
+//									.ifPresent(item -> entries.add(Pair.of(null, item.getSecond())));
+//							Optional.ofNullable(((VariableEntry) entry.getSecond()).separatorData)
+//									.ifPresent(item -> entries.add(Pair.of(null, item.getSecond())));
+//							Optional.ofNullable(((VariableEntry) entry.getSecond()).patternData)
+//									.ifPresent(item -> entries.add(Pair.of(null, item.getSecond())));
+//							Optional.ofNullable(((VariableEntry) entry.getSecond()).defaultData)
+//									.ifPresent(item -> entries.add(Pair.of(null, item.getSecond())));
 
 							return entries;
 
@@ -118,18 +131,71 @@ public class ObjectFormatter {
 					}, item -> {
 
 						if (item.getSecond() instanceof CompoundEntry) {
-							return item.getFirst() != null ? String.format("[COM] %s", item.getFirst()) : "[COM]";
+							return Optional.of((CompoundEntry) item.getSecond())
+									.map(entry -> item.getFirst() != null
+											? String.format("[COMPOUND] %s :: %s", item.getFirst(),
+													entry.pattern.substring(entry.beginIndex, entry.endIndex))
+											: String.format("[COMPOUND] %s",
+													entry.pattern.substring(entry.beginIndex, entry.endIndex)))
+									.get();
 						} else if (item.getSecond() instanceof VariableEntry) {
-							return item.getFirst() != null ? String.format("[VAR] %s", item.getFirst()) : "[VAR]";
+							return Optional.of((VariableEntry) item.getSecond())
+									.map(entry -> item.getFirst() != null
+											? String.format("[VARIABLE] %s :: %s", item.getFirst(),
+													entry.pattern.substring(entry.beginIndex, entry.endIndex))
+											: String.format("[VARIABLE] %s",
+													entry.pattern.substring(entry.beginIndex, entry.endIndex)))
+									.get();
 						} else if (item.getSecond() instanceof SimpleEntry) {
-							return item.getFirst() != null
-									? String.format("[TXT] %s -> %s", item.getFirst(),
-											((SimpleEntry) item.getSecond()).value)
-									: String.format("[TXT] %s", ((SimpleEntry) item.getSecond()).value);
+							return Optional.of((SimpleEntry) item.getSecond())
+									.map(entry -> item.getFirst() != null
+											? String.format("[SIMPLE] %s :: %s", item.getFirst(),
+													entry.pattern.substring(entry.beginIndex, entry.endIndex))
+											: String.format("[SIMPLE] %s",
+													entry.pattern.substring(entry.beginIndex, entry.endIndex)))
+									.get();
 						}
 
 						return "";
 					}));
+		}
+	}
+
+	public String format(Object object) {
+		return format(object, Locale.getDefault(Locale.Category.FORMAT));
+	}
+
+	/**
+	 * Formats an object using this formatter.
+	 * 
+	 * @param object to format, not null
+	 * @param locale to use, not null
+	 * @return the formatted string, not null
+	 */
+	public String format(Object object, Locale locale) {
+		return format(ObjectHolder.of(object, configuration), locale);
+	}
+
+	public String format(ObjectHolder<?> objectHolder) {
+		return format(objectHolder, Locale.getDefault(Locale.Category.FORMAT));
+	}
+
+	public String format(ObjectHolder<?> objectHolder, final Locale locale) {
+
+		Objects.requireNonNull(objectHolder, "object must not be null");
+		Objects.requireNonNull(locale, "locale must not be null");
+
+		try {
+
+			return root.format(objectHolder, locale, true);
+
+		} catch (Exception e) {
+
+			if (logger.isErrorEnabled()) {
+				logger.error(e.getMessage(), e);
+			}
+
+			throw new FormatException(e.getMessage(), e);
 		}
 	}
 
@@ -154,10 +220,18 @@ public class ObjectFormatter {
 	 */
 	interface Entry {
 
-		// TODO: add format method!
+		public default String format(ObjectHolder<?> objectHolder, Locale locale, boolean empty) throws Exception {
+			return null;
+		}
 	}
 
 	static abstract class BaseEntry implements Entry {
+
+		protected final String pattern;
+
+		protected final int beginIndex;
+
+		protected final int endIndex;
 
 		protected final Configuration configuration;
 
@@ -171,16 +245,24 @@ public class ObjectFormatter {
 
 		protected final String variablePropertySeparatorSequence;
 
-		BaseEntry(Configuration configuration) {
+		protected final String variablePropertyValueSeparatorSequence;
 
+		BaseEntry(String pattern, int beginIndex, int endIndex, Configuration configuration) {
+
+			this.pattern = pattern;
+			this.beginIndex = beginIndex;
+			this.endIndex = endIndex;
 			this.configuration = configuration;
 
-			this.escapeSequence = configuration.getParserConfiguration().getEscapeSequence();
-			this.variableStartSequence = configuration.getParserConfiguration().getVariableStartSequence();
-			this.variableEndSequence = configuration.getParserConfiguration().getVariableEndSequence();
-			this.variableSeparatorSequence = configuration.getParserConfiguration().getVariableSeparatorSequence();
-			this.variablePropertySeparatorSequence = configuration.getParserConfiguration()
-					.getVariablePropertySeparatorSequence();
+			ParserConfiguration parserConfiguration = configuration.getParserConfiguration();
+
+			this.escapeSequence = parserConfiguration.getEscapeSequence();
+			this.variableStartSequence = parserConfiguration.getVariableStartSequence();
+			this.variableEndSequence = parserConfiguration.getVariableEndSequence();
+			this.variableSeparatorSequence = parserConfiguration.getVariableSeparatorSequence();
+			this.variablePropertySeparatorSequence = parserConfiguration.getVariablePropertySeparatorSequence();
+			this.variablePropertyValueSeparatorSequence = parserConfiguration
+					.getVariablePropertyValueSeparatorSequence();
 		}
 
 		public String unescape(final String pattern) {
@@ -279,7 +361,7 @@ public class ObjectFormatter {
 
 		CompoundEntry(final String pattern, final int beginIndex, final int endIndex, Configuration configuration) {
 
-			super(configuration);
+			super(pattern, beginIndex, endIndex, configuration);
 
 			// Parse pattern
 			parsePattern(pattern, beginIndex, endIndex);
@@ -354,7 +436,7 @@ public class ObjectFormatter {
 
 						// If we are not dealing with any entry
 						// or we are dealing with simple type entry
-						if ((type == null) || (type == Type.SIMPLE)) {
+						if (type == null || type == Type.SIMPLE) {
 							throw new PatternSyntaxException("missing start of variable", pattern, i);
 						}
 
@@ -428,6 +510,25 @@ public class ObjectFormatter {
 					}
 				}
 			}
+		}
+
+		@Override
+		public String format(ObjectHolder<?> objectHolder, Locale locale, boolean empty) throws Exception {
+
+			StringBuilder result = new StringBuilder();
+
+			for (Entry entry : entries) {
+
+				// TODO: is it OK to always check on zero length?
+
+				String format = entry.format(objectHolder, locale, empty && (result.length() == 0));
+
+				if (format != null) {
+					result.append(format);
+				}
+			}
+
+			return result.toString();
 		}
 	}
 
@@ -541,23 +642,23 @@ public class ObjectFormatter {
 	 */
 	static final class VariableEntry extends BaseEntry {
 
-		private Entry id;
+		private Pair<String, Entry> idData;
 
-		private Entry padding;
+		private Pair<String, Entry> paddingData;
 
-		private Entry prefix;
+		private Pair<String, Entry> prefixData;
 
-		private Entry suffix;
+		private Pair<String, Entry> suffixData;
 
-		private Entry separator;
+		private Pair<String, Entry> separatorData;
 
-		private Entry patternn;
+		private Pair<String, Entry> patternData;
 
-		private Entry defaultt;
+		private Pair<String, Entry> defaultData;
 
 		VariableEntry(final String pattern, final int beginIndex, final int endIndex, Configuration configuration) {
 
-			super(configuration);
+			super(pattern, beginIndex, endIndex, configuration);
 
 			// Parse pattern
 			parsePattern(pattern, beginIndex, endIndex);
@@ -670,9 +771,8 @@ public class ObjectFormatter {
 				}
 			}
 
-			if (id == null) {
-				throw new PatternSyntaxException("missing mandatory variable property \"id\"",
-						pattern, endIndex);
+			if (idData == null) {
+				throw new PatternSyntaxException("missing mandatory variable property \"id\"", pattern, endIndex);
 			}
 		}
 
@@ -717,46 +817,48 @@ public class ObjectFormatter {
 						}
 
 						String name = unescape(property.getFirst());
+						String value = property.getSecond();
 
+						// TODO: make it use constants!
 						if (name.equals("id")) {
 
-							if (id != null) {
+							if (idData != null) {
 								throw new PatternSyntaxException("id property value already defined", pattern,
 										beginIndex);
 							}
 
-							id = new CompoundEntry(pattern, i + variablePropertySeparatorSequence.length(), endIndex,
-									configuration);
+							idData = Pair.of(value, new CompoundEntry(pattern,
+									i + variablePropertySeparatorSequence.length(), endIndex, configuration));
 
 						} else if (name.equals("separator")) {
 
-							if (separator != null) {
+							if (separatorData != null) {
 								throw new PatternSyntaxException("separator property value already defined", pattern,
 										beginIndex);
 							}
 
-							separator = new CompoundEntry(pattern, i + variablePropertySeparatorSequence.length(),
-									endIndex, configuration);
+							separatorData = Pair.of(value, new CompoundEntry(pattern,
+									i + variablePropertySeparatorSequence.length(), endIndex, configuration));
 
 						} else if (name.equals("pattern")) {
 
-							if (patternn != null) {
+							if (patternData != null) {
 								throw new PatternSyntaxException("pattern property value already defined", pattern,
 										beginIndex);
 							}
 
-							patternn = new CompoundEntry(pattern, i + variablePropertySeparatorSequence.length(),
-									endIndex, configuration);
+							patternData = Pair.of(value, new CompoundEntry(pattern,
+									i + variablePropertySeparatorSequence.length(), endIndex, configuration));
 
 						} else if (name.equals("default")) {
 
-							if (defaultt != null) {
+							if (defaultData != null) {
 								throw new PatternSyntaxException("default property value already defined", pattern,
 										beginIndex);
 							}
 
-							defaultt = new CompoundEntry(pattern, i + variablePropertySeparatorSequence.length(),
-									endIndex, configuration);
+							defaultData = Pair.of(value, new CompoundEntry(pattern,
+									i + variablePropertySeparatorSequence.length(), endIndex, configuration));
 
 						} else {
 							throw new PatternSyntaxException(
@@ -782,13 +884,135 @@ public class ObjectFormatter {
 				// If this is the last character
 				if (i == (endIndex - 1)) {
 
-					if (id != null) {
+					if (idData != null) {
 						throw new PatternSyntaxException("id property value already defined", pattern, beginIndex);
 					}
 
-					id = new CompoundEntry(pattern, beginIndex, endIndex, configuration);
+					// TODO: make it use constant!
+					idData = Pair.of("id", new CompoundEntry(pattern, beginIndex, endIndex, configuration));
 				}
 			}
+		}
+
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@Override
+		public String format(ObjectHolder<?> objectHolder, Locale locale, boolean empty) throws Exception {
+
+			String id = idData.getSecond().format(objectHolder, locale, empty);
+
+			if (id == null) {
+
+				if (logger.isErrorEnabled()) {
+					logger.error("id is empty");
+				}
+
+				throw new FormatException("id is empty");
+			}
+
+			String[] values = id.split(Pattern.quote(variablePropertyValueSeparatorSequence), 2);
+
+			String objectId = values.length == 2 ? values[0] : null;
+			String propertyId = values.length == 2 ? values[1] : values[0];
+
+			ObjectHolder<?> targetObjectHolder = null;
+			ObjectHolder<?> parentObjectHolder = objectHolder;
+
+			outer: while (parentObjectHolder != null) {
+
+				ObjectMetadata objectMetadata = parentObjectHolder.getMetadata();
+
+				if (objectId == null || objectMetadata.getId().equals(objectId)
+						|| objectMetadata.getAliases().contains(objectId)) {
+
+					for (PropertyMetadata propertyMetadata : objectMetadata.getProperties()) {
+
+						if (propertyMetadata.getId().equals(propertyId)
+								|| propertyMetadata.getAliases().contains(propertyId)) {
+
+							Extractor extractor = null;
+
+							if (propertyMetadata.getExtractor() != null) {
+								extractor = propertyMetadata.getExtractor().newInstance();
+							} else {
+								extractor = source -> propertyMetadata.getValue(source);
+							}
+
+							Object object = extractor.extract(parentObjectHolder.getObject());
+							Class<? extends Formatter<?>> formatter = propertyMetadata.getFormatter();
+
+							targetObjectHolder = ObjectHolder.of(object, objectHolder, configuration, formatter);
+							break outer;
+						}
+					}
+
+					if (objectId != null) {
+
+						if (logger.isErrorEnabled()) {
+							logger.error(String.format("property with id %s of object with id %s is not found",
+									propertyId, objectId));
+						}
+
+						throw new FormatException(String.format("property with id %s of object with id %s is not found",
+								propertyId, objectId));
+					}
+				}
+
+				parentObjectHolder = parentObjectHolder.getParent();
+			}
+
+			if (targetObjectHolder == null) {
+
+				if (objectId != null) {
+
+					if (logger.isErrorEnabled()) {
+						logger.error(String.format("object with id %s is not found", objectId));
+					}
+
+					throw new FormatException(String.format("object with id %s is not found", objectId));
+				}
+
+				if (logger.isErrorEnabled()) {
+					logger.error(String.format("property with id %s is not found", propertyId));
+				}
+
+				throw new FormatException(String.format("property with id %s is not found", propertyId));
+			}
+
+			Formatter formatter = null;
+
+			if (targetObjectHolder.getMetadata().getFormatter() != null) {
+
+				formatter = targetObjectHolder.getMetadata().getFormatter().newInstance();
+
+			} else {
+
+				Class<?> type = targetObjectHolder.getMetadata().getType();
+
+				formatter = FormatterRegistry.get().getFormatter(type);
+			}
+
+			String result = null;
+
+			if (formatter != null) {
+
+				result = formatter.format(targetObjectHolder, configuration,
+						separatorData != null ? separatorData.getSecond().format(objectHolder, locale, empty) : null,
+						patternData != null ? patternData.getFirst() : null, locale);
+
+			} else if (patternData != null) {
+
+				result = patternData.getSecond().format(targetObjectHolder, locale, empty);
+
+			} else {
+
+				result = targetObjectHolder.getObject().toString();
+			}
+
+			if (result == null && defaultData != null) {
+				result = defaultData.getSecond().format(objectHolder, locale, true);
+			}
+
+			return result;
 		}
 	}
 
@@ -849,7 +1073,7 @@ public class ObjectFormatter {
 
 		SimpleEntry(final String pattern, final int beginIndex, final int endIndex, Configuration configuration) {
 
-			super(configuration);
+			super(pattern, beginIndex, endIndex, configuration);
 
 			// Parse pattern
 			parsePattern(pattern, beginIndex, endIndex);
@@ -862,6 +1086,11 @@ public class ObjectFormatter {
 			}
 
 			this.value = unescape(pattern.substring(beginIndex, endIndex));
+		}
+
+		@Override
+		public String format(ObjectHolder<?> objectHolder, Locale locale, boolean empty) throws Exception {
+			return value;
 		}
 	}
 }

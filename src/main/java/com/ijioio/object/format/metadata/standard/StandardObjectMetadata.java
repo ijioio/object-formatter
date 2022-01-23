@@ -44,6 +44,10 @@ public class StandardObjectMetadata implements ObjectMetadata {
 
 	private void init() {
 
+		Set<String> aliases = new HashSet<>();
+
+		Class<? extends Formatter<?>> formatter = null;
+
 		FormatType formatType = type.getAnnotation(FormatType.class);
 
 		if (formatType != null) {
@@ -53,6 +57,8 @@ public class StandardObjectMetadata implements ObjectMetadata {
 			if (alias != null) {
 				aliases.add(alias);
 			}
+
+			formatter = !formatType.formatter().equals(Formatter.Empty.class) ? formatType.formatter() : null;
 		}
 
 		if (delegateType != null) {
@@ -66,7 +72,16 @@ public class StandardObjectMetadata implements ObjectMetadata {
 				if (alias != null) {
 					aliases.add(alias);
 				}
+
+				formatter = !formatType.formatter().equals(Formatter.Empty.class) ? formatType.formatter() : null;
 			}
+		}
+
+		this.aliases.clear();
+		this.aliases.addAll(aliases);
+
+		if (this.formatter == null) {
+			this.formatter = formatter;
 		}
 
 		Map<String, Field> fields = new HashMap<>();
@@ -155,13 +170,13 @@ public class StandardObjectMetadata implements ObjectMetadata {
 	}
 
 	@Override
-	public Class<?> getType() {
-		return MetadataUtil.normalizeType(type);
+	public String getId() {
+		return type.getName();
 	}
 
 	@Override
-	public String getId() {
-		return type.getName();
+	public Class<?> getType() {
+		return MetadataUtil.normalizeType(type);
 	}
 
 	@Override

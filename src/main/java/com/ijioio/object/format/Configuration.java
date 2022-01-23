@@ -81,6 +81,8 @@ public class Configuration {
 
 		private static final String VARIABLE_PROPERTY_SEPARATOR_SEQUENCE_DEFAULT_VALUE = "=";
 
+		private static final String VARIABLE_PROPERTY_VALUE_SEPARATOR_SEQUENCE_DEFAULT_VALUE = ":";
+
 		public static ParserConfigurationBuilder builder() {
 			return new ParserConfigurationBuilder(null);
 		}
@@ -99,6 +101,8 @@ public class Configuration {
 
 		private final String variablePropertySeparatorSequence;
 
+		private final String variablePropertyValueSeparatorSequence;
+
 		private ParserConfiguration(ParserConfigurationBuilder builder) {
 
 			this.escapeSequence = Optional.ofNullable(builder.escapeSequence).orElse(ESCAPE_SEQUENCE_DEFAULT_VALUE);
@@ -110,6 +114,9 @@ public class Configuration {
 					.orElse(VARIABLE_SEPARATOR_SEQUENCE_DEFAULT_VALUE);
 			this.variablePropertySeparatorSequence = Optional.ofNullable(builder.variablePropertySeparatorSequence)
 					.orElse(VARIABLE_PROPERTY_SEPARATOR_SEQUENCE_DEFAULT_VALUE);
+			this.variablePropertyValueSeparatorSequence = Optional
+					.ofNullable(builder.variablePropertyValueSeparatorSequence)
+					.orElse(VARIABLE_PROPERTY_VALUE_SEPARATOR_SEQUENCE_DEFAULT_VALUE);
 
 			// TODO: validate not empty, not contains substring, etc.
 		}
@@ -134,6 +141,10 @@ public class Configuration {
 			return variablePropertySeparatorSequence;
 		}
 
+		public String getVariablePropertyValueSeparatorSequence() {
+			return variablePropertyValueSeparatorSequence;
+		}
+
 		public static class ParserConfigurationBuilder {
 
 			private final ConfigurationBuilder parent;
@@ -147,6 +158,8 @@ public class Configuration {
 			private String variableSeparatorSequence;
 
 			private String variablePropertySeparatorSequence;
+
+			private String variablePropertyValueSeparatorSequence;
 
 			private ParserConfigurationBuilder(ConfigurationBuilder parent) {
 				this.parent = parent;
@@ -179,6 +192,12 @@ public class Configuration {
 			public ParserConfigurationBuilder variablePropertySeparatorSequence(String value) {
 
 				variablePropertySeparatorSequence = value;
+				return this;
+			}
+
+			public ParserConfigurationBuilder variablePropertyValueSeparatorSequence(String value) {
+
+				variablePropertyValueSeparatorSequence = value;
 				return this;
 			}
 

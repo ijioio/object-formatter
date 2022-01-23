@@ -31,6 +31,12 @@ public class ObjectHolder<V> {
 		return new ObjectHolder<V>(object, parent, configuration, null);
 	}
 
+	public static <V> ObjectHolder<V> of(V object, ObjectHolder<?> parent, Configuration configuration,
+			Class<? extends Formatter<?>> formatter) {
+		return new ObjectHolder<V>(object, parent, configuration, formatter);
+	}
+
+	// TODO: rename parent to previous
 	private ObjectHolder(V object, ObjectHolder<?> parent, Configuration configuration,
 			Class<? extends Formatter<?>> formatter) {
 
