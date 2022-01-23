@@ -7,9 +7,9 @@ import com.ijioio.object.format.formatter.Formatter;
 
 public interface ObjectMetadata {
 
-	public Class<?> getType();
-
 	public String getId();
+
+	public Class<?> getType();
 
 	public Class<? extends Formatter<?>> getFormatter();
 

@@ -9,9 +9,9 @@ public interface PropertyMetadata {
 
 	public static final String THIS = "this";
 
-	public Class<?> getType();
-
 	public String getId();
+
+	public Class<?> getType();
 
 	public Class<? extends Extractor<?>> getExtractor();
 
