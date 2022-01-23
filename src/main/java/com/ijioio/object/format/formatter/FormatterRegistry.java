@@ -1,5 +1,6 @@
 package com.ijioio.object.format.formatter;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ public class FormatterRegistry {
 		register(String.class, new StringFormatter());
 		register(Number.class, new NumberFormatter());
 		register(Date.class, new DateFormatter());
+		register(LocalDate.class, new LocalDateFormatter());
 		register(Collection.class, new CollectionFormatter());
 	}
 
