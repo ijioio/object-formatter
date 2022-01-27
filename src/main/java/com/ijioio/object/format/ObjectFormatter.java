@@ -101,23 +101,28 @@ public class ObjectFormatter {
 
 							Collection<Pair<String, Entry>> entries = new ArrayList<>();
 
-							// TODO: make it use constants!
 							Optional.ofNullable(((VariableEntry) entry.getSecond()).idData)
-									.ifPresent(item -> entries.add(Pair.of("id", item.getSecond())));
+									.ifPresent(item -> entries.add(Pair.of(
+											configuration.getParserConfiguration().getVariablePropertyNameIdSequence(),
+											item.getSecond())));
 							Optional.ofNullable(((VariableEntry) entry.getSecond()).separatorData)
-									.ifPresent(item -> entries.add(Pair.of("separator", item.getSecond())));
+									.ifPresent(
+											item -> entries.add(Pair.of(
+													configuration.getParserConfiguration()
+															.getVariablePropertyNameSeparatorSequence(),
+													item.getSecond())));
 							Optional.ofNullable(((VariableEntry) entry.getSecond()).patternData)
-									.ifPresent(item -> entries.add(Pair.of("pattern", item.getSecond())));
+									.ifPresent(
+											item -> entries.add(Pair.of(
+													configuration.getParserConfiguration()
+															.getVariablePropertyNamePatternSequence(),
+													item.getSecond())));
 							Optional.ofNullable(((VariableEntry) entry.getSecond()).defaultData)
-									.ifPresent(item -> entries.add(Pair.of("default", item.getSecond())));
-//							Optional.ofNullable(((VariableEntry) entry.getSecond()).idData)
-//									.ifPresent(item -> entries.add(Pair.of(null, item.getSecond())));
-//							Optional.ofNullable(((VariableEntry) entry.getSecond()).separatorData)
-//									.ifPresent(item -> entries.add(Pair.of(null, item.getSecond())));
-//							Optional.ofNullable(((VariableEntry) entry.getSecond()).patternData)
-//									.ifPresent(item -> entries.add(Pair.of(null, item.getSecond())));
-//							Optional.ofNullable(((VariableEntry) entry.getSecond()).defaultData)
-//									.ifPresent(item -> entries.add(Pair.of(null, item.getSecond())));
+									.ifPresent(
+											item -> entries.add(Pair.of(
+													configuration.getParserConfiguration()
+															.getVariablePropertyNameDefaultSequence(),
+													item.getSecond())));
 
 							return entries;
 
@@ -247,6 +252,20 @@ public class ObjectFormatter {
 
 		protected final String variablePropertyValueSeparatorSequence;
 
+		protected final String variablePropertyNameIdSequence;
+
+		protected final String variablePropertyNamePaddingSequence;
+
+		protected final String variablePropertyNamePrefixSequence;
+
+		protected final String variablePropertyNameSuffixSequence;
+
+		protected final String variablePropertyNameSeparatorSequence;
+
+		protected final String variablePropertyNamePatternSequence;
+
+		protected final String variablePropertyNameDefaultSequence;
+
 		BaseEntry(String pattern, int beginIndex, int endIndex, Configuration configuration) {
 
 			this.pattern = pattern;
@@ -263,6 +282,13 @@ public class ObjectFormatter {
 			this.variablePropertySeparatorSequence = parserConfiguration.getVariablePropertySeparatorSequence();
 			this.variablePropertyValueSeparatorSequence = parserConfiguration
 					.getVariablePropertyValueSeparatorSequence();
+			this.variablePropertyNameIdSequence = parserConfiguration.getVariablePropertyNameIdSequence();
+			this.variablePropertyNamePaddingSequence = parserConfiguration.getVariablePropertyNamePaddingSequence();
+			this.variablePropertyNamePrefixSequence = parserConfiguration.getVariablePropertyNamePrefixSequence();
+			this.variablePropertyNameSuffixSequence = parserConfiguration.getVariablePropertyNameSuffixSequence();
+			this.variablePropertyNameSeparatorSequence = parserConfiguration.getVariablePropertyNameSeparatorSequence();
+			this.variablePropertyNamePatternSequence = parserConfiguration.getVariablePropertyNamePatternSequence();
+			this.variablePropertyNameDefaultSequence = parserConfiguration.getVariablePropertyNameDefaultSequence();
 		}
 
 		public String unescape(final String pattern) {
@@ -772,7 +798,9 @@ public class ObjectFormatter {
 			}
 
 			if (idData == null) {
-				throw new PatternSyntaxException("missing mandatory variable property \"id\"", pattern, endIndex);
+				throw new PatternSyntaxException(
+						String.format("missing mandatory variable property \"%s\"", variablePropertyNameIdSequence),
+						pattern, endIndex);
 			}
 		}
 
@@ -819,42 +847,41 @@ public class ObjectFormatter {
 						String name = unescape(property.getFirst());
 						String value = property.getSecond();
 
-						// TODO: make it use constants!
-						if (name.equals("id")) {
+						if (name.equals(variablePropertyNameIdSequence)) {
 
 							if (idData != null) {
-								throw new PatternSyntaxException("id property value already defined", pattern,
-										beginIndex);
+								throw new PatternSyntaxException(String.format("%s property value already defined",
+										variablePropertyNameIdSequence), pattern, beginIndex);
 							}
 
 							idData = Pair.of(value, new CompoundEntry(pattern,
 									i + variablePropertySeparatorSequence.length(), endIndex, configuration));
 
-						} else if (name.equals("separator")) {
+						} else if (name.equals(variablePropertyNameSeparatorSequence)) {
 
 							if (separatorData != null) {
-								throw new PatternSyntaxException("separator property value already defined", pattern,
-										beginIndex);
+								throw new PatternSyntaxException(String.format("%s property value already defined",
+										variablePropertyNameSeparatorSequence), pattern, beginIndex);
 							}
 
 							separatorData = Pair.of(value, new CompoundEntry(pattern,
 									i + variablePropertySeparatorSequence.length(), endIndex, configuration));
 
-						} else if (name.equals("pattern")) {
+						} else if (name.equals(variablePropertyNamePatternSequence)) {
 
 							if (patternData != null) {
-								throw new PatternSyntaxException("pattern property value already defined", pattern,
-										beginIndex);
+								throw new PatternSyntaxException(String.format("%s property value already defined",
+										variablePropertyNamePatternSequence), pattern, beginIndex);
 							}
 
 							patternData = Pair.of(value, new CompoundEntry(pattern,
 									i + variablePropertySeparatorSequence.length(), endIndex, configuration));
 
-						} else if (name.equals("default")) {
+						} else if (name.equals(variablePropertyNameDefaultSequence)) {
 
 							if (defaultData != null) {
-								throw new PatternSyntaxException("default property value already defined", pattern,
-										beginIndex);
+								throw new PatternSyntaxException(String.format("%s property value already defined",
+										variablePropertyNameDefaultSequence), pattern, beginIndex);
 							}
 
 							defaultData = Pair.of(value, new CompoundEntry(pattern,
@@ -885,11 +912,13 @@ public class ObjectFormatter {
 				if (i == (endIndex - 1)) {
 
 					if (idData != null) {
-						throw new PatternSyntaxException("id property value already defined", pattern, beginIndex);
+						throw new PatternSyntaxException(
+								String.format("%s property value already defined", variablePropertyNameIdSequence),
+								pattern, beginIndex);
 					}
 
-					// TODO: make it use constant!
-					idData = Pair.of("id", new CompoundEntry(pattern, beginIndex, endIndex, configuration));
+					idData = Pair.of(variablePropertyNameIdSequence,
+							new CompoundEntry(pattern, beginIndex, endIndex, configuration));
 				}
 			}
 		}
@@ -903,10 +932,10 @@ public class ObjectFormatter {
 			if (id == null) {
 
 				if (logger.isErrorEnabled()) {
-					logger.error("id is empty");
+					logger.error("variable property id is empty");
 				}
 
-				throw new FormatException("id is empty");
+				throw new FormatException("variable property id is empty");
 			}
 
 			String[] values = id.split(Pattern.quote(variablePropertyValueSeparatorSequence), 2);
