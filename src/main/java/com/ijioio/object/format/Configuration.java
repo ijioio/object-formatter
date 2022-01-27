@@ -83,6 +83,20 @@ public class Configuration {
 
 		private static final String VARIABLE_PROPERTY_VALUE_SEPARATOR_SEQUENCE_DEFAULT_VALUE = ":";
 
+		private static final String VARIABLE_PROPERTY_NAME_ID_SEQUENCE_DEFAULT_VALUE = "id";
+
+		private static final String VARIABLE_PROPERTY_NAME_PADDING_SEQUENCE_DEFAULT_VALUE = "padding";
+
+		private static final String VARIABLE_PROPERTY_NAME_PREFIX_SEQUENCE_DEFAULT_VALUE = "prefix";
+
+		private static final String VARIABLE_PROPERTY_NAME_SUFFIX_SEQUENCE_DEFAULT_VALUE = "suffix";
+
+		private static final String VARIABLE_PROPERTY_NAME_SEPARATOR_SEQUENCE_DEFAULT_VALUE = "separator";
+
+		private static final String VARIABLE_PROPERTY_NAME_PATTERN_SEQUENCE_DEFAULT_VALUE = "pattern";
+
+		private static final String VARIABLE_PROPERTY_NAME_DEFAULT_SEQUENCE_DEFAULT_VALUE = "default";
+
 		public static ParserConfigurationBuilder builder() {
 			return new ParserConfigurationBuilder(null);
 		}
@@ -103,6 +117,20 @@ public class Configuration {
 
 		private final String variablePropertyValueSeparatorSequence;
 
+		private final String variablePropertyNameIdSequence;
+
+		private final String variablePropertyNamePaddingSequence;
+
+		private final String variablePropertyNamePrefixSequence;
+
+		private final String variablePropertyNameSuffixSequence;
+
+		private final String variablePropertyNameSeparatorSequence;
+
+		private final String variablePropertyNamePatternSequence;
+
+		private final String variablePropertyNameDefaultSequence;
+
 		private ParserConfiguration(ParserConfigurationBuilder builder) {
 
 			this.escapeSequence = Optional.ofNullable(builder.escapeSequence).orElse(ESCAPE_SEQUENCE_DEFAULT_VALUE);
@@ -117,6 +145,21 @@ public class Configuration {
 			this.variablePropertyValueSeparatorSequence = Optional
 					.ofNullable(builder.variablePropertyValueSeparatorSequence)
 					.orElse(VARIABLE_PROPERTY_VALUE_SEPARATOR_SEQUENCE_DEFAULT_VALUE);
+			this.variablePropertyNameIdSequence = Optional.ofNullable(builder.variablePropertyNameIdSequence)
+					.orElse(VARIABLE_PROPERTY_NAME_ID_SEQUENCE_DEFAULT_VALUE);
+			this.variablePropertyNamePaddingSequence = Optional.ofNullable(builder.variablePropertyNamePaddingSequence)
+					.orElse(VARIABLE_PROPERTY_NAME_PADDING_SEQUENCE_DEFAULT_VALUE);
+			this.variablePropertyNamePrefixSequence = Optional.ofNullable(builder.variablePropertyNamePrefixSequence)
+					.orElse(VARIABLE_PROPERTY_NAME_PREFIX_SEQUENCE_DEFAULT_VALUE);
+			this.variablePropertyNameSuffixSequence = Optional.ofNullable(builder.variablePropertyNameSuffixSequence)
+					.orElse(VARIABLE_PROPERTY_NAME_SUFFIX_SEQUENCE_DEFAULT_VALUE);
+			this.variablePropertyNameSeparatorSequence = Optional
+					.ofNullable(builder.variablePropertyNameSeparatorSequence)
+					.orElse(VARIABLE_PROPERTY_NAME_SEPARATOR_SEQUENCE_DEFAULT_VALUE);
+			this.variablePropertyNamePatternSequence = Optional.ofNullable(builder.variablePropertyNamePatternSequence)
+					.orElse(VARIABLE_PROPERTY_NAME_PATTERN_SEQUENCE_DEFAULT_VALUE);
+			this.variablePropertyNameDefaultSequence = Optional.ofNullable(builder.variablePropertyNameDefaultSequence)
+					.orElse(VARIABLE_PROPERTY_NAME_DEFAULT_SEQUENCE_DEFAULT_VALUE);
 
 			// TODO: validate not empty, not contains substring, etc.
 		}
@@ -145,6 +188,34 @@ public class Configuration {
 			return variablePropertyValueSeparatorSequence;
 		}
 
+		public String getVariablePropertyNameIdSequence() {
+			return variablePropertyNameIdSequence;
+		}
+
+		public String getVariablePropertyNamePaddingSequence() {
+			return variablePropertyNamePaddingSequence;
+		}
+
+		public String getVariablePropertyNamePrefixSequence() {
+			return variablePropertyNamePrefixSequence;
+		}
+
+		public String getVariablePropertyNameSuffixSequence() {
+			return variablePropertyNameSuffixSequence;
+		}
+
+		public String getVariablePropertyNameSeparatorSequence() {
+			return variablePropertyNameSeparatorSequence;
+		}
+
+		public String getVariablePropertyNamePatternSequence() {
+			return variablePropertyNamePatternSequence;
+		}
+
+		public String getVariablePropertyNameDefaultSequence() {
+			return variablePropertyNameDefaultSequence;
+		}
+
 		public static class ParserConfigurationBuilder {
 
 			private final ConfigurationBuilder parent;
@@ -160,6 +231,20 @@ public class Configuration {
 			private String variablePropertySeparatorSequence;
 
 			private String variablePropertyValueSeparatorSequence;
+
+			private String variablePropertyNameIdSequence;
+
+			private String variablePropertyNamePaddingSequence;
+
+			private String variablePropertyNamePrefixSequence;
+
+			private String variablePropertyNameSuffixSequence;
+
+			private String variablePropertyNameSeparatorSequence;
+
+			private String variablePropertyNamePatternSequence;
+
+			private String variablePropertyNameDefaultSequence;
 
 			private ParserConfigurationBuilder(ConfigurationBuilder parent) {
 				this.parent = parent;
@@ -198,6 +283,48 @@ public class Configuration {
 			public ParserConfigurationBuilder variablePropertyValueSeparatorSequence(String value) {
 
 				variablePropertyValueSeparatorSequence = value;
+				return this;
+			}
+
+			public ParserConfigurationBuilder variablePropertyNameIdSequence(String value) {
+
+				variablePropertyNameIdSequence = value;
+				return this;
+			}
+
+			public ParserConfigurationBuilder variablePropertyNamePaddingSequence(String value) {
+
+				variablePropertyNamePaddingSequence = value;
+				return this;
+			}
+
+			public ParserConfigurationBuilder variablePropertyNamePrefixSequence(String value) {
+
+				variablePropertyNamePrefixSequence = value;
+				return this;
+			}
+
+			public ParserConfigurationBuilder variablePropertyNameSuffixSequence(String value) {
+
+				variablePropertyNameSuffixSequence = value;
+				return this;
+			}
+
+			public ParserConfigurationBuilder variablePropertyNameSeparatorSequence(String value) {
+
+				variablePropertyNameSeparatorSequence = value;
+				return this;
+			}
+
+			public ParserConfigurationBuilder variablePropertyNamePatternSequence(String value) {
+
+				variablePropertyNamePatternSequence = value;
+				return this;
+			}
+
+			public ParserConfigurationBuilder variablePropertyNameDefaultSequence(String value) {
+
+				variablePropertyNameDefaultSequence = value;
 				return this;
 			}
 
