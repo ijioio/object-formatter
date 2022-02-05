@@ -250,8 +250,6 @@ public class ObjectFormatter {
 
 		protected final String variablePropertySeparatorSequence;
 
-		protected final String variablePropertyValueSeparatorSequence;
-
 		protected final String variablePropertyNameIdSequence;
 
 		protected final String variablePropertyNamePaddingSequence;
@@ -265,6 +263,8 @@ public class ObjectFormatter {
 		protected final String variablePropertyNamePatternSequence;
 
 		protected final String variablePropertyNameDefaultSequence;
+
+		protected final String variablePropertyValueSeparatorSequence;
 
 		BaseEntry(String pattern, int beginIndex, int endIndex, Configuration configuration) {
 
@@ -280,8 +280,6 @@ public class ObjectFormatter {
 			this.variableEndSequence = parserConfiguration.getVariableEndSequence();
 			this.variableSeparatorSequence = parserConfiguration.getVariableSeparatorSequence();
 			this.variablePropertySeparatorSequence = parserConfiguration.getVariablePropertySeparatorSequence();
-			this.variablePropertyValueSeparatorSequence = parserConfiguration
-					.getVariablePropertyValueSeparatorSequence();
 			this.variablePropertyNameIdSequence = parserConfiguration.getVariablePropertyNameIdSequence();
 			this.variablePropertyNamePaddingSequence = parserConfiguration.getVariablePropertyNamePaddingSequence();
 			this.variablePropertyNamePrefixSequence = parserConfiguration.getVariablePropertyNamePrefixSequence();
@@ -289,6 +287,8 @@ public class ObjectFormatter {
 			this.variablePropertyNameSeparatorSequence = parserConfiguration.getVariablePropertyNameSeparatorSequence();
 			this.variablePropertyNamePatternSequence = parserConfiguration.getVariablePropertyNamePatternSequence();
 			this.variablePropertyNameDefaultSequence = parserConfiguration.getVariablePropertyNameDefaultSequence();
+			this.variablePropertyValueSeparatorSequence = parserConfiguration
+					.getVariablePropertyValueSeparatorSequence();
 		}
 
 		public String unescape(final String pattern) {
