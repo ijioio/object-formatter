@@ -7,6 +7,7 @@ import java.util.Locale;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.ijioio.object.format.Configuration;
 import com.ijioio.object.format.ObjectFormatter;
 
 public class ObjectFormatterTest {
@@ -110,7 +111,7 @@ public class ObjectFormatterTest {
 	}
 
 	@Test
-	public void formatVariableWithDateAndPattern() {
+	public void formatVariableOfStringAndDateWithPattern() {
 
 		F1Driver driver = F1Driver.builder() //
 				.firstName("Lewis") //
@@ -123,6 +124,144 @@ public class ObjectFormatterTest {
 				.of("${id=firstName} ${id=lastName} ${id=birthdate|pattern=yyyy.MM.dd}");
 
 		String expected = "Lewis Hamilton 1985.01.07";
+		String actual = format.format(driver, Locale.ENGLISH);
+
+		Assert.assertEquals(expected, actual);
+	}
+
+	@Test
+	public void parserConfigurationCustomEscapeSequence() {
+
+		F1Driver driver = F1Driver.builder() //
+				.firstName("Lewis") //
+				.lastName("Hamilton") //
+				.build();
+
+		Configuration configuration = Configuration.builder() //
+				.parserConfiguration() //
+				.escapeSequence("##") //
+				.end() //
+				.build();
+
+		ObjectFormatter format = ObjectFormatter.of(
+				"##Name: ${id=firstName} ${id=lastName}## #### ${id=##first##Name} ${##id##=lastName}", configuration);
+
+		String expected = "Name: ${id=firstName} ${id=lastName} ## Lewis Hamilton";
+		String actual = format.format(driver, Locale.ENGLISH);
+
+		Assert.assertEquals(expected, actual);
+	}
+
+	@Test
+	public void parserConfigurationCustomVariableDelimiterSequence() {
+
+		F1Driver driver = F1Driver.builder() //
+				.firstName("Lewis") //
+				.lastName("Hamilton") //
+				.build();
+
+		Configuration configuration = Configuration.builder() //
+				.parserConfiguration() //
+				.variableStartSequence("<<") //
+				.variableEndSequence(">>") //
+				.end() //
+				.build();
+
+		ObjectFormatter format = ObjectFormatter.of("Name: <<id=firstName>> <<id=lastName>>", configuration);
+
+		String expected = "Name: Lewis Hamilton";
+		String actual = format.format(driver, Locale.ENGLISH);
+
+		Assert.assertEquals(expected, actual);
+	}
+
+//	@Test
+//	public void parserConfigurationCustomVariableSeparatorSequence() {
+//
+//		F1Driver driver = F1Driver.builder() //
+//				.firstName("Lewis") //
+//				.lastName(null) //
+//				.build();
+//
+//		Configuration configuration = Configuration.builder() //
+//				.parserConfiguration() //
+//				.variableSeparatorSequence("!!") //
+//				.end() //
+//				.build();
+//
+//		ObjectFormatter format = ObjectFormatter
+//				.of("Name: ${id=firstName!!default=Anonymous} ${id=lastName!!default=Anonymous}", configuration);
+//
+//		String expected = "Name: Lewis Anonymous";
+//		String actual = format.format(driver, Locale.ENGLISH);
+//
+//		Assert.assertEquals(expected, actual);
+//	}
+
+	@Test
+	public void parserConfigurationCustomVariablePropertySeparatorSequence() {
+
+		F1Driver driver = F1Driver.builder() //
+				.firstName("Lewis") //
+				.lastName("Hamilton") //
+				.build();
+
+		Configuration configuration = Configuration.builder() //
+				.parserConfiguration() //
+				.variablePropertySeparatorSequence("->") //
+				.end() //
+				.build();
+
+		ObjectFormatter format = ObjectFormatter.of("Name: ${id->firstName} ${id->lastName}", configuration);
+
+		String expected = "Name: Lewis Hamilton";
+		String actual = format.format(driver, Locale.ENGLISH);
+
+		Assert.assertEquals(expected, actual);
+	}
+
+	@Test
+	public void parserConfigurationCustomVariablePropertyNameIdSequence() {
+
+		F1Driver driver = F1Driver.builder() //
+				.firstName("Lewis") //
+				.lastName("Hamilton") //
+				.build();
+
+		Configuration configuration = Configuration.builder() //
+				.parserConfiguration() //
+				.variablePropertyNameIdSequence("idproperty") //
+				.end() //
+				.build();
+
+		ObjectFormatter format = ObjectFormatter.of("Name: ${idproperty=firstName} ${idproperty=lastName}",
+				configuration);
+
+		String expected = "Name: Lewis Hamilton";
+		String actual = format.format(driver, Locale.ENGLISH);
+
+		Assert.assertEquals(expected, actual);
+	}
+
+	@Test
+	public void parserConfigurationCustomVariablePropertyValueSeparatorSequence() {
+
+		F1Driver driver = F1Driver.builder() //
+				.firstName("Lewis") //
+				.lastName("Hamilton") //
+				.build();
+
+		Configuration configuration = Configuration.builder() //
+				.parserConfiguration() //
+				.variablePropertyValueSeparatorSequence("::") //
+				.end() //
+				.build();
+
+		ObjectFormatter format = ObjectFormatter
+				.of("Name: ${id=com.ijioio.object.format.test.ObjectFormatterTest$F1Driver::firstName} "
+						+ "${id=com.ijioio.object.format.test.ObjectFormatterTest$F1Driver::lastName}", configuration);
+
+		String expected = "Name: Lewis Hamilton";
 		String actual = format.format(driver, Locale.ENGLISH);
 
 		Assert.assertEquals(expected, actual);
