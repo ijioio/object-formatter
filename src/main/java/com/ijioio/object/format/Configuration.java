@@ -81,8 +81,6 @@ public class Configuration {
 
 		private static final String VARIABLE_PROPERTY_SEPARATOR_SEQUENCE_DEFAULT_VALUE = "=";
 
-		private static final String VARIABLE_PROPERTY_VALUE_SEPARATOR_SEQUENCE_DEFAULT_VALUE = ":";
-
 		private static final String VARIABLE_PROPERTY_NAME_ID_SEQUENCE_DEFAULT_VALUE = "id";
 
 		private static final String VARIABLE_PROPERTY_NAME_PADDING_SEQUENCE_DEFAULT_VALUE = "padding";
@@ -96,6 +94,8 @@ public class Configuration {
 		private static final String VARIABLE_PROPERTY_NAME_PATTERN_SEQUENCE_DEFAULT_VALUE = "pattern";
 
 		private static final String VARIABLE_PROPERTY_NAME_DEFAULT_SEQUENCE_DEFAULT_VALUE = "default";
+
+		private static final String VARIABLE_PROPERTY_VALUE_SEPARATOR_SEQUENCE_DEFAULT_VALUE = ":";
 
 		public static ParserConfigurationBuilder builder() {
 			return new ParserConfigurationBuilder(null);
@@ -115,8 +115,6 @@ public class Configuration {
 
 		private final String variablePropertySeparatorSequence;
 
-		private final String variablePropertyValueSeparatorSequence;
-
 		private final String variablePropertyNameIdSequence;
 
 		private final String variablePropertyNamePaddingSequence;
@@ -131,6 +129,8 @@ public class Configuration {
 
 		private final String variablePropertyNameDefaultSequence;
 
+		private final String variablePropertyValueSeparatorSequence;
+
 		private ParserConfiguration(ParserConfigurationBuilder builder) {
 
 			this.escapeSequence = Optional.ofNullable(builder.escapeSequence).orElse(ESCAPE_SEQUENCE_DEFAULT_VALUE);
@@ -142,9 +142,6 @@ public class Configuration {
 					.orElse(VARIABLE_SEPARATOR_SEQUENCE_DEFAULT_VALUE);
 			this.variablePropertySeparatorSequence = Optional.ofNullable(builder.variablePropertySeparatorSequence)
 					.orElse(VARIABLE_PROPERTY_SEPARATOR_SEQUENCE_DEFAULT_VALUE);
-			this.variablePropertyValueSeparatorSequence = Optional
-					.ofNullable(builder.variablePropertyValueSeparatorSequence)
-					.orElse(VARIABLE_PROPERTY_VALUE_SEPARATOR_SEQUENCE_DEFAULT_VALUE);
 			this.variablePropertyNameIdSequence = Optional.ofNullable(builder.variablePropertyNameIdSequence)
 					.orElse(VARIABLE_PROPERTY_NAME_ID_SEQUENCE_DEFAULT_VALUE);
 			this.variablePropertyNamePaddingSequence = Optional.ofNullable(builder.variablePropertyNamePaddingSequence)
@@ -160,6 +157,9 @@ public class Configuration {
 					.orElse(VARIABLE_PROPERTY_NAME_PATTERN_SEQUENCE_DEFAULT_VALUE);
 			this.variablePropertyNameDefaultSequence = Optional.ofNullable(builder.variablePropertyNameDefaultSequence)
 					.orElse(VARIABLE_PROPERTY_NAME_DEFAULT_SEQUENCE_DEFAULT_VALUE);
+			this.variablePropertyValueSeparatorSequence = Optional
+					.ofNullable(builder.variablePropertyValueSeparatorSequence)
+					.orElse(VARIABLE_PROPERTY_VALUE_SEPARATOR_SEQUENCE_DEFAULT_VALUE);
 
 			// TODO: validate not empty, not contains substring, etc.
 		}
@@ -182,10 +182,6 @@ public class Configuration {
 
 		public String getVariablePropertySeparatorSequence() {
 			return variablePropertySeparatorSequence;
-		}
-
-		public String getVariablePropertyValueSeparatorSequence() {
-			return variablePropertyValueSeparatorSequence;
 		}
 
 		public String getVariablePropertyNameIdSequence() {
@@ -216,6 +212,10 @@ public class Configuration {
 			return variablePropertyNameDefaultSequence;
 		}
 
+		public String getVariablePropertyValueSeparatorSequence() {
+			return variablePropertyValueSeparatorSequence;
+		}
+
 		public static class ParserConfigurationBuilder {
 
 			private final ConfigurationBuilder parent;
@@ -230,8 +230,6 @@ public class Configuration {
 
 			private String variablePropertySeparatorSequence;
 
-			private String variablePropertyValueSeparatorSequence;
-
 			private String variablePropertyNameIdSequence;
 
 			private String variablePropertyNamePaddingSequence;
@@ -245,6 +243,8 @@ public class Configuration {
 			private String variablePropertyNamePatternSequence;
 
 			private String variablePropertyNameDefaultSequence;
+
+			private String variablePropertyValueSeparatorSequence;
 
 			private ParserConfigurationBuilder(ConfigurationBuilder parent) {
 				this.parent = parent;
@@ -277,12 +277,6 @@ public class Configuration {
 			public ParserConfigurationBuilder variablePropertySeparatorSequence(String value) {
 
 				variablePropertySeparatorSequence = value;
-				return this;
-			}
-
-			public ParserConfigurationBuilder variablePropertyValueSeparatorSequence(String value) {
-
-				variablePropertyValueSeparatorSequence = value;
 				return this;
 			}
 
@@ -325,6 +319,12 @@ public class Configuration {
 			public ParserConfigurationBuilder variablePropertyNameDefaultSequence(String value) {
 
 				variablePropertyNameDefaultSequence = value;
+				return this;
+			}
+
+			public ParserConfigurationBuilder variablePropertyValueSeparatorSequence(String value) {
+
+				variablePropertyValueSeparatorSequence = value;
 				return this;
 			}
 
