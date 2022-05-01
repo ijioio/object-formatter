@@ -31,13 +31,12 @@ public class StandardObjectMetadata implements ObjectMetadata {
 
 	private final List<PropertyMetadata> properties = new ArrayList<>();
 
-	public StandardObjectMetadata(Class<?> type, Class<?> delegateType, Class<? extends Formatter<?>> formatter) {
+	public StandardObjectMetadata(Class<?> type, Class<?> delegateType) {
 
 		Objects.requireNonNull(type, "type must not be null");
 
 		this.type = type;
 		this.delegateType = delegateType;
-		this.formatter = formatter;
 
 		init();
 	}
@@ -80,9 +79,7 @@ public class StandardObjectMetadata implements ObjectMetadata {
 		this.aliases.clear();
 		this.aliases.addAll(aliases);
 
-		if (this.formatter == null) {
-			this.formatter = formatter;
-		}
+		this.formatter = formatter;
 
 		Map<String, Field> fields = new HashMap<>();
 

@@ -111,20 +111,25 @@ public class StandardPropertyMetadata implements PropertyMetadata {
 	@Override
 	public Object getValue(Object object) throws Exception {
 
-		if (field != null) {
+		if (object != null) {
 
-			if (!field.isAccessible()) {
-				field.setAccessible(true);
+			if (field != null) {
+
+				if (!field.isAccessible()) {
+					field.setAccessible(true);
+				}
+
+				return field.get(object);
 			}
 
-			return field.get(object);
+			if (!delegateField.isAccessible()) {
+				delegateField.setAccessible(true);
+			}
+
+			return delegateField.get(object);
 		}
 
-		if (!delegateField.isAccessible()) {
-			delegateField.setAccessible(true);
-		}
-
-		return delegateField.get(object);
+		return null;
 	}
 
 	@Override

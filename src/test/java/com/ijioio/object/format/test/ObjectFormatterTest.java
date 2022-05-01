@@ -76,21 +76,21 @@ public class ObjectFormatterTest {
 		Assert.assertEquals(expected, actual);
 	}
 
-//	@Test
-//	public void formatVariableOfStringAndDefault() {
-//
-//		F1Driver driver = F1Driver.builder() //
-//				.firstName("Lewis") //
-//				.lastName(null) //
-//				.build();
-//
-//		ObjectFormatter format = ObjectFormatter.of("${id=firstName} ${id=lastName|default=Anonymous}");
-//
-//		String expected = "Lewis Anonymous";
-//		String actual = format.format(driver, Locale.ENGLISH);
-//
-//		Assert.assertEquals(expected, actual);
-//	}
+	@Test
+	public void formatVariableOfStringAndDefault() {
+
+		F1Driver driver = F1Driver.builder() //
+				.firstName("Lewis") //
+				.lastName(null) //
+				.build();
+
+		ObjectFormatter format = ObjectFormatter.of("${id=firstName} ${id=lastName|default=Anonymous}");
+
+		String expected = "Lewis Anonymous";
+		String actual = format.format(driver, Locale.ENGLISH);
+
+		Assert.assertEquals(expected, actual);
+	}
 
 	@Test
 	public void formatVariableOfStringAndDate() {
@@ -175,28 +175,28 @@ public class ObjectFormatterTest {
 		Assert.assertEquals(expected, actual);
 	}
 
-//	@Test
-//	public void parserConfigurationCustomVariableSeparatorSequence() {
-//
-//		F1Driver driver = F1Driver.builder() //
-//				.firstName("Lewis") //
-//				.lastName(null) //
-//				.build();
-//
-//		Configuration configuration = Configuration.builder() //
-//				.parserConfiguration() //
-//				.variableSeparatorSequence("!!") //
-//				.end() //
-//				.build();
-//
-//		ObjectFormatter format = ObjectFormatter
-//				.of("Name: ${id=firstName!!default=Anonymous} ${id=lastName!!default=Anonymous}", configuration);
-//
-//		String expected = "Name: Lewis Anonymous";
-//		String actual = format.format(driver, Locale.ENGLISH);
-//
-//		Assert.assertEquals(expected, actual);
-//	}
+	@Test
+	public void parserConfigurationCustomVariableSeparatorSequence() {
+
+		F1Driver driver = F1Driver.builder() //
+				.firstName("Lewis") //
+				.lastName(null) //
+				.build();
+
+		Configuration configuration = Configuration.builder() //
+				.parserConfiguration() //
+				.variableSeparatorSequence("!!") //
+				.end() //
+				.build();
+
+		ObjectFormatter format = ObjectFormatter
+				.of("Name: ${id=firstName!!default=Anonymous} ${id=lastName!!default=Anonymous}", configuration);
+
+		String expected = "Name: Lewis Anonymous";
+		String actual = format.format(driver, Locale.ENGLISH);
+
+		Assert.assertEquals(expected, actual);
+	}
 
 	@Test
 	public void parserConfigurationCustomVariablePropertySeparatorSequence() {

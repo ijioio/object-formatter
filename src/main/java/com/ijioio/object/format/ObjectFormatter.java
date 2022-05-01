@@ -943,7 +943,9 @@ public class ObjectFormatter {
 			String objectId = values.length == 2 ? values[0] : null;
 			String propertyId = values.length == 2 ? values[1] : values[0];
 
+			Class<? extends Formatter<?>> targetObjectFormatter = null;
 			ObjectHolder<?> targetObjectHolder = null;
+
 			ObjectHolder<?> parentObjectHolder = objectHolder;
 
 			outer: while (parentObjectHolder != null) {
@@ -967,9 +969,15 @@ public class ObjectFormatter {
 							}
 
 							Object object = extractor.extract(parentObjectHolder.getObject());
-							Class<? extends Formatter<?>> formatter = propertyMetadata.getFormatter();
+							targetObjectFormatter = propertyMetadata.getFormatter();
 
-							targetObjectHolder = ObjectHolder.of(object, objectHolder, configuration, formatter);
+							if (object != null) {
+								targetObjectHolder = ObjectHolder.of(object, objectHolder, configuration);
+							} else {
+								targetObjectHolder = ObjectHolder.of(propertyMetadata.getType(), objectHolder,
+										configuration);
+							}
+
 							break outer;
 						}
 					}
@@ -1009,7 +1017,11 @@ public class ObjectFormatter {
 
 			Formatter formatter = null;
 
-			if (targetObjectHolder.getMetadata().getFormatter() != null) {
+			if (targetObjectFormatter != null) {
+
+				formatter = targetObjectFormatter.newInstance();
+
+			} else if (targetObjectHolder.getMetadata().getFormatter() != null) {
 
 				formatter = targetObjectHolder.getMetadata().getFormatter().newInstance();
 
@@ -1032,7 +1044,7 @@ public class ObjectFormatter {
 
 				result = patternData.getSecond().format(targetObjectHolder, locale, empty);
 
-			} else {
+			} else if (targetObjectHolder.getObject() != null) {
 
 				result = targetObjectHolder.getObject().toString();
 			}
