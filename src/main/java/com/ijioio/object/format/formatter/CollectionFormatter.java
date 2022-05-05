@@ -20,7 +20,7 @@ public class CollectionFormatter implements Formatter<Collection<?>> {
 
 		return Optional.ofNullable(values).map(items -> {
 
-			ObjectFormatter format = ObjectFormatter.of(pattern != null ? pattern : Pattern.self());
+			ObjectFormatter format = ObjectFormatter.of(pattern != null ? pattern : Pattern.self(configuration));
 
 			return items.stream().map(item -> ObjectHolder.of(item, objectHolder))
 					.map(item -> format.format(item, locale))
