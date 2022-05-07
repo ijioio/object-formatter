@@ -9,9 +9,6 @@ public class PatternUtil {
 
 	public static class Pattern {
 
-		// TODO: move to configuration!
-		public static final String SEPARATOR = ", ";
-
 		public static String self() {
 			return self(null, Configuration.builder().build());
 		}
