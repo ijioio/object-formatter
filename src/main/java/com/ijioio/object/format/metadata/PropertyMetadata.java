@@ -2,6 +2,7 @@ package com.ijioio.object.format.metadata;
 
 import java.util.Set;
 
+import com.ijioio.object.format.extractor.Converter;
 import com.ijioio.object.format.extractor.Extractor;
 import com.ijioio.object.format.formatter.Formatter;
 
@@ -14,6 +15,8 @@ public interface PropertyMetadata {
 	public Class<?> getType();
 
 	public Class<? extends Extractor<?>> getExtractor();
+
+	public Class<? extends Converter<?>> getConverter();
 
 	public Class<? extends Formatter<?>> getFormatter();
 
