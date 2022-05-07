@@ -24,7 +24,7 @@ public class CollectionFormatter implements Formatter<Collection<?>> {
 
 			return items.stream().map(item -> ObjectHolder.of(item, objectHolder))
 					.map(item -> format.format(item, locale))
-					.collect(Collectors.joining(separator != null ? separator : Pattern.SEPARATOR));
+					.collect(Collectors.joining(separator != null ? separator : configuration.getSeparatorSequence()));
 
 		}).orElse(null);
 	}

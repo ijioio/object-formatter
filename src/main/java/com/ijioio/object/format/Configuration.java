@@ -10,9 +10,13 @@ import com.ijioio.object.format.Configuration.ParserConfiguration.ParserConfigur
 
 public class Configuration {
 
+	private static final String SEPARATOR_SEQUENCE_DEFAULT_VALUE = ", ";
+
 	public static ConfigurationBuilder builder() {
 		return new ConfigurationBuilder();
 	}
+
+	private final String separatorSequence;
 
 	private final ParserConfiguration parserConfiguration;
 
@@ -20,10 +24,16 @@ public class Configuration {
 
 	private Configuration(ConfigurationBuilder builder) {
 
+		this.separatorSequence = Optional.ofNullable(builder.separatorSequence)
+				.orElse(SEPARATOR_SEQUENCE_DEFAULT_VALUE);
 		this.parserConfiguration = Optional.ofNullable(builder.parserConfiguration)
 				.orElse(ParserConfiguration.builder().build());
 		this.delegateConfiguration = Optional.ofNullable(builder.delegateConfiguration)
 				.orElse(DelegateConfiguration.builder().build());
+	}
+
+	public String getSeparatorSequence() {
+		return separatorSequence;
 	}
 
 	public ParserConfiguration getParserConfiguration() {
@@ -36,12 +46,20 @@ public class Configuration {
 
 	public static class ConfigurationBuilder {
 
+		private String separatorSequence;
+
 		private ParserConfiguration parserConfiguration;
 
 		private DelegateConfiguration delegateConfiguration;
 
 		private ConfigurationBuilder() {
 			// Empty
+		}
+
+		public ConfigurationBuilder separatorSequence(String separatorSequence) {
+
+			this.separatorSequence = separatorSequence;
+			return this;
 		}
 
 		public ConfigurationBuilder parserConfiguration(ParserConfiguration parserConfiguration) {
