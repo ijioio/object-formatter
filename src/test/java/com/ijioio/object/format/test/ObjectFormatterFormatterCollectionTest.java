@@ -17,7 +17,6 @@ import com.ijioio.object.format.annotation.FormatType;
 import com.ijioio.object.format.formatter.Formatter;
 import com.ijioio.object.format.formatter.FormatterRegistry;
 import com.ijioio.object.format.object.ObjectHolder;
-import com.ijioio.object.format.util.PatternUtil.Pattern;
 
 public class ObjectFormatterFormatterCollectionTest {
 
@@ -234,7 +233,7 @@ public class ObjectFormatterFormatterCollectionTest {
 		public String format(ObjectHolder<List<Passport>> objectHolder, Configuration configuration, String separator,
 				String pattern, Locale locale) throws Exception {
 			return objectHolder.getObject().stream().map(item -> "[EF] " + item.getNumber())
-					.collect(Collectors.joining(Pattern.SEPARATOR));
+					.collect(Collectors.joining(configuration.getSeparatorSequence()));
 		}
 	}
 
@@ -316,7 +315,7 @@ public class ObjectFormatterFormatterCollectionTest {
 		public String format(ObjectHolder<List<Job>> objectHolder, Configuration configuration, String separator,
 				String pattern, Locale locale) throws Exception {
 			return objectHolder.getObject().stream().map(item -> "[EF] " + item.getPosition())
-					.collect(Collectors.joining(Pattern.SEPARATOR));
+					.collect(Collectors.joining(configuration.getSeparatorSequence()));
 		}
 	}
 
@@ -399,7 +398,7 @@ public class ObjectFormatterFormatterCollectionTest {
 		public String format(ObjectHolder<List<Hobby>> objectHolder, Configuration configuration, String separator,
 				String pattern, Locale locale) throws Exception {
 			return objectHolder.getObject().stream().map(item -> "[EF] " + item.getName())
-					.collect(Collectors.joining(Pattern.SEPARATOR));
+					.collect(Collectors.joining(configuration.getSeparatorSequence()));
 		}
 	}
 
@@ -482,7 +481,7 @@ public class ObjectFormatterFormatterCollectionTest {
 		public String format(ObjectHolder<List<Pet>> objectHolder, Configuration configuration, String separator,
 				String pattern, Locale locale) throws Exception {
 			return objectHolder.getObject().stream().map(item -> "[EF] " + item.getName())
-					.collect(Collectors.joining(Pattern.SEPARATOR));
+					.collect(Collectors.joining(configuration.getSeparatorSequence()));
 		}
 	}
 
