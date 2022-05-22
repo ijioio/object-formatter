@@ -14,8 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ijioio.object.format.Configuration.ParserConfiguration;
+import com.ijioio.object.format.converter.Converter;
+import com.ijioio.object.format.converter.ConverterRegistry;
 import com.ijioio.object.format.exception.FormatException;
-import com.ijioio.object.format.extractor.Extractor;
 import com.ijioio.object.format.formatter.Formatter;
 import com.ijioio.object.format.formatter.FormatterRegistry;
 import com.ijioio.object.format.metadata.ObjectMetadata;
@@ -943,6 +944,7 @@ public class ObjectFormatter {
 			String objectId = values.length == 2 ? values[0] : null;
 			String propertyId = values.length == 2 ? values[1] : values[0];
 
+			Class<? extends Converter<?, ?>> targetObjectConverter = null;
 			Class<? extends Formatter<?>> targetObjectFormatter = null;
 			ObjectHolder<?> targetObjectHolder = null;
 
@@ -960,16 +962,10 @@ public class ObjectFormatter {
 						if (propertyMetadata.getId().equals(propertyId)
 								|| propertyMetadata.getAliases().contains(propertyId)) {
 
-							Extractor extractor = null;
-
-							if (propertyMetadata.getExtractor() != null) {
-								extractor = propertyMetadata.getExtractor().newInstance();
-							} else {
-								extractor = source -> propertyMetadata.getValue(source);
-							}
-
-							Object object = extractor.extract(parentObjectHolder.getObject());
+							targetObjectConverter = propertyMetadata.getConverter();
 							targetObjectFormatter = propertyMetadata.getFormatter();
+
+							Object object = propertyMetadata.getValue(parentObjectHolder.getObject());
 
 							if (object != null) {
 								targetObjectHolder = ObjectHolder.of(object, objectHolder, configuration);
@@ -1013,6 +1009,34 @@ public class ObjectFormatter {
 				}
 
 				throw new FormatException(String.format("property with id %s is not found", propertyId));
+			}
+
+			Converter converter = null;
+
+			if (targetObjectConverter != null) {
+
+				converter = targetObjectConverter.newInstance();
+
+			} else if (targetObjectHolder.getMetadata().getConverter() != null) {
+
+				converter = targetObjectHolder.getMetadata().getConverter().newInstance();
+
+			} else {
+
+				Class<?> type = targetObjectHolder.getMetadata().getType();
+
+				converter = ConverterRegistry.get().getConverter(type);
+			}
+
+			if (converter != null) {
+
+				Object object = converter.convert(targetObjectHolder.getObject());
+
+				if (object != null) {
+					targetObjectHolder = ObjectHolder.of(object, objectHolder, configuration);
+				} else {
+					targetObjectHolder = ObjectHolder.of(converter.getType(), objectHolder, configuration);
+				}
 			}
 
 			Formatter formatter = null;
