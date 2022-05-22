@@ -3,7 +3,7 @@ package com.ijioio.object.format.metadata;
 import java.util.List;
 import java.util.Set;
 
-import com.ijioio.object.format.extractor.Converter;
+import com.ijioio.object.format.converter.Converter;
 import com.ijioio.object.format.formatter.Formatter;
 
 public interface ObjectMetadata {
@@ -12,7 +12,7 @@ public interface ObjectMetadata {
 
 	public Class<?> getType();
 
-	public Class<? extends Converter<?>> getConverter();
+	public Class<? extends Converter<?, ?>> getConverter();
 
 	public Class<? extends Formatter<?>> getFormatter();
 
