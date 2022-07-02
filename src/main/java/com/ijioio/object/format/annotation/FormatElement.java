@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.ijioio.object.format.extractor.Converter;
 import com.ijioio.object.format.extractor.Extractor;
 import com.ijioio.object.format.formatter.Formatter;
 
@@ -15,6 +16,8 @@ public @interface FormatElement {
 	public String value() default "";
 
 	public Class<? extends Extractor<?>> extractor() default Extractor.Empty.class;
+
+	public Class<? extends Converter<?>> converter() default Converter.Empty.class;
 
 	public Class<? extends Formatter<?>> formatter() default Formatter.Empty.class;
 }

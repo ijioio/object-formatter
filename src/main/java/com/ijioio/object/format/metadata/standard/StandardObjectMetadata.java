@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.ijioio.object.format.annotation.FormatType;
+import com.ijioio.object.format.extractor.Converter;
 import com.ijioio.object.format.extractor.Extractor;
 import com.ijioio.object.format.formatter.Formatter;
 import com.ijioio.object.format.metadata.ObjectMetadata;
@@ -24,6 +25,8 @@ public class StandardObjectMetadata implements ObjectMetadata {
 	private final Class<?> type;
 
 	private final Class<?> delegateType;
+
+	private Class<? extends Converter<?>> converter;
 
 	private Class<? extends Formatter<?>> formatter;
 
@@ -45,6 +48,7 @@ public class StandardObjectMetadata implements ObjectMetadata {
 
 		Set<String> aliases = new HashSet<>();
 
+		Class<? extends Converter<?>> converter = null;
 		Class<? extends Formatter<?>> formatter = null;
 
 		FormatType formatType = type.getAnnotation(FormatType.class);
@@ -57,6 +61,7 @@ public class StandardObjectMetadata implements ObjectMetadata {
 				aliases.add(alias);
 			}
 
+			converter = !formatType.converter().equals(Converter.Empty.class) ? formatType.converter() : null;
 			formatter = !formatType.formatter().equals(Formatter.Empty.class) ? formatType.formatter() : null;
 		}
 
@@ -72,6 +77,7 @@ public class StandardObjectMetadata implements ObjectMetadata {
 					aliases.add(alias);
 				}
 
+				converter = !formatType.converter().equals(Converter.Empty.class) ? formatType.converter() : null;
 				formatter = !formatType.formatter().equals(Formatter.Empty.class) ? formatType.formatter() : null;
 			}
 		}
@@ -79,6 +85,7 @@ public class StandardObjectMetadata implements ObjectMetadata {
 		this.aliases.clear();
 		this.aliases.addAll(aliases);
 
+		this.converter = converter;
 		this.formatter = formatter;
 
 		Map<String, Field> fields = new HashMap<>();
@@ -150,6 +157,11 @@ public class StandardObjectMetadata implements ObjectMetadata {
 			}
 
 			@Override
+			public Class<? extends Converter<?>> getConverter() {
+				return null;
+			}
+
+			@Override
 			public Class<? extends Formatter<?>> getFormatter() {
 				return null;
 			}
@@ -174,6 +186,11 @@ public class StandardObjectMetadata implements ObjectMetadata {
 	@Override
 	public Class<?> getType() {
 		return MetadataUtil.normalizeType(type);
+	}
+
+	@Override
+	public Class<? extends Converter<?>> getConverter() {
+		return converter;
 	}
 
 	@Override
