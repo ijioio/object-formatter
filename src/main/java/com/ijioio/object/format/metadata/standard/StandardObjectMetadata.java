@@ -13,8 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.ijioio.object.format.annotation.FormatType;
-import com.ijioio.object.format.extractor.Converter;
-import com.ijioio.object.format.extractor.Extractor;
+import com.ijioio.object.format.converter.Converter;
 import com.ijioio.object.format.formatter.Formatter;
 import com.ijioio.object.format.metadata.ObjectMetadata;
 import com.ijioio.object.format.metadata.PropertyMetadata;
@@ -26,7 +25,7 @@ public class StandardObjectMetadata implements ObjectMetadata {
 
 	private final Class<?> delegateType;
 
-	private Class<? extends Converter<?>> converter;
+	private Class<? extends Converter<?, ?>> converter;
 
 	private Class<? extends Formatter<?>> formatter;
 
@@ -48,7 +47,7 @@ public class StandardObjectMetadata implements ObjectMetadata {
 
 		Set<String> aliases = new HashSet<>();
 
-		Class<? extends Converter<?>> converter = null;
+		Class<? extends Converter<?, ?>> converter = null;
 		Class<? extends Formatter<?>> formatter = null;
 
 		FormatType formatType = type.getAnnotation(FormatType.class);
@@ -152,12 +151,7 @@ public class StandardObjectMetadata implements ObjectMetadata {
 			}
 
 			@Override
-			public Class<? extends Extractor<?>> getExtractor() {
-				return null;
-			}
-
-			@Override
-			public Class<? extends Converter<?>> getConverter() {
+			public Class<? extends Converter<?, ?>> getConverter() {
 				return null;
 			}
 
@@ -189,7 +183,7 @@ public class StandardObjectMetadata implements ObjectMetadata {
 	}
 
 	@Override
-	public Class<? extends Converter<?>> getConverter() {
+	public Class<? extends Converter<?, ?>> getConverter() {
 		return converter;
 	}
 

@@ -6,8 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.ijioio.object.format.annotation.FormatElement;
-import com.ijioio.object.format.extractor.Converter;
-import com.ijioio.object.format.extractor.Extractor;
+import com.ijioio.object.format.converter.Converter;
 import com.ijioio.object.format.formatter.Formatter;
 import com.ijioio.object.format.metadata.PropertyMetadata;
 import com.ijioio.object.format.util.MetadataUtil;
@@ -18,9 +17,7 @@ public class StandardPropertyMetadata implements PropertyMetadata {
 
 	private final Field delegateField;
 
-	private Class<? extends Extractor<?>> extractor;
-
-	private Class<? extends Converter<?>> converter;
+	private Class<? extends Converter<?, ?>> converter;
 
 	private Class<? extends Formatter<?>> formatter;
 
@@ -42,8 +39,7 @@ public class StandardPropertyMetadata implements PropertyMetadata {
 
 		Set<String> aliases = new HashSet<>();
 
-		Class<? extends Extractor<?>> extractor = null;
-		Class<? extends Converter<?>> converter = null;
+		Class<? extends Converter<?, ?>> converter = null;
 		Class<? extends Formatter<?>> formatter = null;
 
 		if (field != null) {
@@ -58,7 +54,6 @@ public class StandardPropertyMetadata implements PropertyMetadata {
 					aliases.add(alias);
 				}
 
-				extractor = !formatElement.extractor().equals(Extractor.Empty.class) ? formatElement.extractor() : null;
 				converter = !formatElement.converter().equals(Converter.Empty.class) ? formatElement.converter() : null;
 				formatter = !formatElement.formatter().equals(Formatter.Empty.class) ? formatElement.formatter() : null;
 			}
@@ -76,7 +71,6 @@ public class StandardPropertyMetadata implements PropertyMetadata {
 					aliases.add(alias);
 				}
 
-				extractor = !formatElement.extractor().equals(Extractor.Empty.class) ? formatElement.extractor() : null;
 				converter = !formatElement.converter().equals(Converter.Empty.class) ? formatElement.converter() : null;
 				formatter = !formatElement.formatter().equals(Formatter.Empty.class) ? formatElement.formatter() : null;
 			}
@@ -85,7 +79,6 @@ public class StandardPropertyMetadata implements PropertyMetadata {
 		this.aliases.clear();
 		this.aliases.addAll(aliases);
 
-		this.extractor = extractor;
 		this.converter = converter;
 		this.formatter = formatter;
 	}
@@ -101,12 +94,7 @@ public class StandardPropertyMetadata implements PropertyMetadata {
 	}
 
 	@Override
-	public Class<? extends Extractor<?>> getExtractor() {
-		return extractor;
-	}
-
-	@Override
-	public Class<? extends Converter<?>> getConverter() {
+	public Class<? extends Converter<?, ?>> getConverter() {
 		return converter;
 	}
 
