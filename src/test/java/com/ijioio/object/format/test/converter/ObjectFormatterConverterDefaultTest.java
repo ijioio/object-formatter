@@ -11,6 +11,7 @@ import com.ijioio.object.format.converter.ConverterRegistry;
 import com.ijioio.object.format.test.builder.BookingBuilder;
 import com.ijioio.object.format.test.builder.BookingBuilder.BookingPrototypeAdapter;
 import com.ijioio.object.format.test.builder.PassengerBuilder.PassengerPrototypeAdapter;
+import com.ijioio.object.format.test.builder.model.Segment;
 
 public class ObjectFormatterConverterDefaultTest {
 
@@ -48,7 +49,7 @@ public class ObjectFormatterConverterDefaultTest {
 		}
 	}
 
-	public static class Booking extends BookingPrototypeAdapter<Passenger> {
+	public static class Booking extends BookingPrototypeAdapter<Passenger, Segment> {
 
 		private String number;
 
