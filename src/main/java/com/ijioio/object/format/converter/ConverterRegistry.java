@@ -17,7 +17,7 @@ public class ConverterRegistry {
 		// Empty
 	}
 
-	public void register(Class<?> type, Converter<?, ?> converter) {
+	public <V> void register(Class<V> type, Converter<V, ?> converter) {
 		converters.put(type, converter);
 	}
 
